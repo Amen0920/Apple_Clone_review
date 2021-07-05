@@ -48,6 +48,17 @@
             scenInfo[i].scrollHeight = scenInfo[i].heightNum * innerHeight;
             scenInfo[i].objs.container.style.height = `${scenInfo[i].scrollHeight}px`;
         }
+
+        let totalScrollHeight = 0;
+        yOffset = pageYOffset;
+        for( let i = 0; i < scenInfo.length; i++){
+            totalScrollHeight += scenInfo[i].scrollHeight;
+            if(totalScrollHeight >= yOffset) {
+                currentScene = i;
+                break;
+            }
+        }
+        document.body.setAttribute('id',`show-scene-${currentScene}`);
     }
 
 
@@ -57,20 +68,25 @@
         for(let i = 0; i < currentScene; i++){
             prevScrollHeight += scenInfo[i].scrollHeight;
         }
-
         if(yOffset > prevScrollHeight + scenInfo[currentScene].scrollHeight) {
             currentScene ++;
+            document.body.setAttribute('id',`show-scene-${currentScene}`);
         }else if( yOffset < prevScrollHeight ){
+            if(currentScene === 0)return;
             currentScene --;
+            document.body.setAttribute('id',`show-scene-${currentScene}`);
         }
-        console.log(currentScene);
+
+        
     }
 
-    window.addEventListener('resize',setLayout);
+
     window.addEventListener('scroll', () => {
         yOffset = pageYOffset;
         scrollLoop();
     });
-    setLayout();
+    window.addEventListener('load',setLayout);
+    window.addEventListener('resize',setLayout);
+    
 
 })();
