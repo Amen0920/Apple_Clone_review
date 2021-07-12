@@ -2,6 +2,7 @@
     let yOffset = 0;
     let prevScrollHeight = 0;
     let currentScene = 0;
+    let enterNewScene = false; 
 
     const scenInfo = [
         {   
@@ -18,7 +19,21 @@
 
             },
             values: {
-                messageA_opacity: [0, 1]
+                messageA_opacity_in: [0, 1, { start: 0.1, end: 0.2 }],
+                messageA_translateY_in: [20, 0, { start: 0.1, end: 0.2 }],
+                messageA_opacity_out: [1, 0, { start: 0.23, end: 0.3 }],
+                messageA_translateY_out: [0, -20, { start: 0.23, end: 0.3}],
+
+                messageB_opacity_in: [0, 1, { start: 0.3, end: 0.4 }],
+
+                messageB_opacity_in: [0, 1, { start: 0.3, end: 0.4 }],
+
+
+                messageB_opacity_in: [0, 1, { start: 0.3, end: 0.4 }],
+
+                
+
+            
             }
         },
         {   
@@ -70,20 +85,58 @@
     };
 
     function calcValues(values, currentYOffset){
+        let rv;
+        const scrollHeight = scenInfo[currentScene].scrollHeight;
+        const scrollRatio = currentYOffset / scrollHeight;
+        
+        if( values[2] ){
+            const partScrollStart = values[2].start * scrollHeight;
+            const partScrollEnd = values[2].end * scrollHeight;
+            const partScrollHeight = partScrollEnd - partScrollStart;
+            if( currentYOffset >= partScrollStart && currentYOffset <= partScrollEnd){
+                rv = (currentYOffset - partScrollStart) / partScrollHeight * ( values[1] - values[0]) + values[0];
+            }else if( currentYOffset < partScrollStart) {
+                rv = values[0];
+            }else if( currentYOffset > partScrollEnd ){
+                rv = values[1];
+            }
 
+
+           
+            
+
+        }else{
+            rv = scrollRatio * ( values[1] - values[0]) + values[0];     
+        }
+        
+    
+        return rv;
     };
 
     function playAnimation() {  
         const values = scenInfo[currentScene].values;
         const objs = scenInfo[currentScene].objs;
         const currentYOffset = yOffset - prevScrollHeight;
+        const scrollHeight = scenInfo[currentScene].scrollHeight;
+        const scrollRatio = currentYOffset / scrollHeight;
 
-
-        switch (currentScen) {
+        switch (currentScene) {
             case 0:
-                let messageA_opacity_0 = values.messageA_opacity[0];
-                let messageA_opacity_1 = values.messageA_opacity[1];
-                calcValues(values.messageA_opacity, )
+                let messageA_opacity_in = calcValues(values.messageA_opacity_in, currentYOffset );
+                let messageA_opacity_out = calcValues(values.messageA_opacity_out, currentYOffset );
+                let messageA_translateY_in = calcValues(values.messageA_translateY_in, currentYOffset);
+                let messageA_translateY_out = calcValues(values.messageA_translateY_out, currentYOffset);
+
+                if ( scrollRatio <= 0.22 ){
+                    objs.messageA.style.opacity = messageA_opacity_in;
+                    objs.messageA.style.transform = `translateY(${messageA_translateY_in}%)`;
+                    
+                }else{
+                    objs.messageA.style.opacity = messageA_opacity_out;
+                    objs.messageA.style.transform = `translateY(${messageA_translateY_out}%)`;
+                }
+               
+                
                 break;
             case 1:
                 break;
@@ -97,18 +150,22 @@
 
    
     function scrollLoop() {
+        enterNewScene = false;
         prevScrollHeight = 0;
         for(let i = 0; i < currentScene; i++){
             prevScrollHeight += scenInfo[i].scrollHeight;
         };
         if(yOffset > prevScrollHeight + scenInfo[currentScene].scrollHeight) {
+            enterNewScene = true;
             currentScene ++;
             document.body.setAttribute('id',`show-scene-${currentScene}`);
         }else if( yOffset < prevScrollHeight ){
+            enterNewScene = true;
             if(currentScene === 0)return;
             currentScene --;
             document.body.setAttribute('id',`show-scene-${currentScene}`);
         };  
+        if( enterNewScene ) return;
         playAnimation();
     };
 
