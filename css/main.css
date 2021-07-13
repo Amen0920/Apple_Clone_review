@@ -26,6 +26,7 @@ a {
     border-bottom: 1px solid #ddd;
     padding: 0 1rem;
     position: absolute;
+    z-index:11;
     width: 100%;
     top:45px;
     left:0;
@@ -33,6 +34,7 @@ a {
 .global-nav {
     height: 44px;
     padding: 0 1rem;
+    z-index:10;
     position: absolute;
     width: 100%;
     top:0;
@@ -66,10 +68,12 @@ a {
 
 .scroll-section {
     padding-top : 50vh;
-    border:2px solid red;
 }
 
 #scroll-section-0 h1 {
+    position: relative;
+    top: -10vh;
+    z-index: 5;
     font-size: 4rem;
     text-align: center;
 }
@@ -168,6 +172,15 @@ a {
 #show-scene-2 #scroll-section-2 .sticky-elem,
 #show-scene-3 #scroll-section-3 .sticky-elem {
     display: block;
+}
+.sticky-elem-canvas{
+    top:0;
+    height: 100%;
+}
+.sticky-elem-canvas canvas{
+    position: absolute;
+    top:50%;
+    left:50%;
 }
 
 @media (min-width:1024px){
